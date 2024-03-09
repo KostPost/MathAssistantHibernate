@@ -2,7 +2,7 @@ package org.kostpost;
 
 import java.util.Stack;
 
-public class EquationService {
+public class CheckEquation {
 
     public String checkEquation(String equation) {
         String formattedEquation = formatEquation(equation);

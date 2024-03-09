@@ -36,7 +36,7 @@ public class Main {
                     Scanner equationInputScanner = new Scanner(System.in);
                     String userInputEquation;
                     Equation currentEquation = null;
-                    EquationService equationService = new EquationService();
+                    CheckEquation equationService = new CheckEquation();
 
                     while (true) {
                         System.out.println("\n--- New Equation Input ---");
@@ -207,8 +207,6 @@ public class Main {
                         }
                     }
                 }
-
-
                 default -> {
                     if (!doAction.equals("3"))
                         System.out.println("Wrong action");
