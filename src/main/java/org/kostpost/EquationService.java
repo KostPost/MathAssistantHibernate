@@ -9,18 +9,23 @@ public class EquationService {
         if (validateEquation(formattedEquation)) {
             equation = formattedEquation;
             return equation;
-        } else {
-            throw new IllegalArgumentException("Некорректное уравнение: " + equation);
+        }
+        else if (!isValidDecimal(equation)) {
+            return null;
+        }else {
+            return null;
         }
     }
 
     public static String formatEquation(String equation) {
-        // Удаляем пробелы
+        // Удаляем пробелы и разрешаем десятичные числа
         equation = equation.replaceAll("\\s+", "");
-        // Удаляем все недопустимые символы, оставляем только цифры и знаки +, -, *, /
-        equation = equation.replaceAll("[^0-9x+-/*=]", "");
+        equation = equation.replaceAll("[^0-9x.+-/*=()]", "");
+
+
         return equation;
     }
+
 
     boolean validateEquation(String equation) {
         if (!checkBrackets(equation)) {
@@ -33,6 +38,21 @@ public class EquationService {
 
         return true;
     }
+    boolean isValidDecimal(String equation) {
+        String[] tokens = equation.split("[=+-/*]"); // Разделяем уравнение на токены по операторам
+        for (String token : tokens) {
+            if (token.isEmpty()) {
+                continue; // Пропускаем пустые токены, которые могут появиться из-за разделения
+            }
+            // Проверяем каждый токен на соответствие шаблону валидного десятичного числа или переменной
+            if (!token.matches("x|\\d+\\.\\d+|\\d+")) {
+                return false; // Невалидный токен
+            }
+        }
+        return true; // Все токены валидны
+    }
+
+
     boolean checkBrackets(String equation) {
         Stack<Character> stack = new Stack<>();
 
@@ -50,126 +70,29 @@ public class EquationService {
     }
 
     boolean isOperatorSequenceValid(String equation) {
+        // Убедитесь, что уравнение содержит только один символ равенства
+        if (equation.chars().filter(ch -> ch == '=').count() != 1) return false;
 
-        String startValidSymbols = "-1234567890x ";
-        if(!startValidSymbols.contains(Character.toString(equation.charAt(0)))){
-            return false;
-        }
+        // Проверка на корректное начало и конец уравнения
+        String validStartSymbols = "-1234567890x(";
+        if (!validStartSymbols.contains(Character.toString(equation.charAt(0)))) return false;
 
-        String endValidSymbols = "1234567890";
-        if(!endValidSymbols.contains(Character.toString(equation.charAt(equation.length() - 1)))) {
-            return false;
-        }
+        String validEndSymbols = "1234567890x)";
+        if (!validEndSymbols.contains(Character.toString(equation.charAt(equation.length() - 1)))) return false;
 
-        String ValidSymbols = "+-*/1234567890x=()";
-        for (int i = 0; i < equation.length() - 1; i++) {
-
-            if(!ValidSymbols.contains(Character.toString(equation.charAt(i))))
-                return false;
-        }
-
-        if(equation.chars().filter(ch -> ch == '=').count() != 1)
-            return false;
-
-        if(equation.chars().filter(ch -> ch == 'x').count() <= 0)
-            return false;
-
-
+        // Проверка на корректное использование операторов и переменных
         for (int i = 0; i < equation.length() - 1; i++) {
             char currentChar = equation.charAt(i);
             char nextChar = equation.charAt(i + 1);
 
-            if(currentChar == 'x' && nextChar == 'x')
-                return false;
+            // Проверка на двойные операторы, исключая "-",
+            // так как "--" может быть частью валидного выражения (например, в "-x=-1")
+            if ("+*/".indexOf(currentChar) >= 0 && "+-*/".indexOf(nextChar) >= 0) return false;
 
-            if ((currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/')
-                    && (nextChar == '+' || nextChar == '-' || nextChar == '*' || nextChar == '/')) {
-                return false;
-            }
+            // Условие, предотвращающее два 'x' подряд, может остаться, если это соответствует вашей логике
+            if (currentChar == 'x' && nextChar == 'x') return false;
         }
         return true;
     }
-
-    public double resolveExpression(String equation) {
-        return new Object() {
-            int pos = -1, ch;
-
-            void nextChar() {
-                ch = (++pos < equation.length()) ? equation.charAt(pos) : -1;
-            }
-
-            boolean eat(int charToEat) {
-                while (ch == ' ') {
-                    nextChar();
-                }
-                if (ch == charToEat) {
-                    nextChar();
-                    return true;
-                }
-                return false;
-            }
-
-            double parse() {
-                nextChar();
-                double x = parseExpression();
-                if (pos < equation.length()) {
-                    throw new RuntimeException("Unexpected: " + (char) ch);
-                }
-                return x;
-            }
-
-            double parseExpression() {
-                double x = parseTerm();
-                for (;;) {
-                    if (eat('+')) {
-                        x += parseTerm();
-                    } else if (eat('-')) {
-                        x -= parseTerm();
-                    } else {
-                        return x;
-                    }
-                }
-            }
-
-            double parseTerm() {
-                double x = parseFactor();
-                for (;;) {
-                    if (eat('*')) {
-                        x *= parseFactor();
-                    } else if (eat('/')) {
-                        x /= parseFactor();
-                    } else {
-                        return x;
-                    }
-                }
-            }
-
-            double parseFactor() {
-                if (eat('+')) {
-                    return parseFactor();
-                }
-                if (eat('-')) {
-                    return -parseFactor();
-                }
-                double x;
-                int startPos = this.pos;
-                if (eat('(')) {
-                    x = parseExpression();
-                    eat(')');
-                } else if ((ch >= '0' && ch <= '9') || ch == '.') {
-                    while ((ch >= '0' && ch <= '9') || ch == '.') {
-                        nextChar();
-                    }
-                    x = Double.parseDouble(equation.substring(startPos, this.pos));
-                } else {
-                    throw new RuntimeException("Unexpected: " + (char) ch);
-                }
-                return x;
-            }
-        }.parse();
-    }
-
-
-
 
 }

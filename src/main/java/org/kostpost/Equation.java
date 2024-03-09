@@ -11,7 +11,7 @@ public class Equation {
     private Long id;
     private String equation;
 
-    private double rootX;
+    private String rootX;
 
     private int quantityX;
 
@@ -28,5 +28,21 @@ public class Equation {
 
     public void setEquation(String equation) {
         this.equation = equation;
+    }
+
+    public String getRootX() {
+        return rootX;
+    }
+
+    public void setRootX(String rootX) {
+        this.rootX = rootX;
+    }
+
+    public int getQuantityX() {
+        return quantityX;
+    }
+
+    public void setQuantityX(int quantityX) {
+        this.quantityX = quantityX;
     }
 }
