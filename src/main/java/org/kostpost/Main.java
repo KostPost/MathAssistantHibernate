@@ -117,7 +117,8 @@ public class Main {
                         System.out.println("1. Find by equation.");
                         System.out.println("2. Find equations by a given root.");
                         System.out.println("3. Find equations by quantity root");
-                        System.out.println("4. Exit");
+                        System.out.println("4. See all equations");
+                        System.out.println("5. Exit");
                         System.out.print("Enter your choice (1-4): ");
 
                         String choice = findScanner.nextLine();
@@ -176,11 +177,10 @@ public class Main {
                                 }
                             }
 
-
                             case "3" -> {
                                 System.out.print("Enter the quantity of roots to search for: ");
                                 int quantityRoot = findScanner.nextInt();
-                                findScanner.nextLine(); // Очистка буфера после чтения числа
+                                findScanner.nextLine(); 
 
                                 SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 
@@ -198,11 +198,25 @@ public class Main {
                                 }
                             }
 
+                            case "4" -> {
+                                SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+                                EquationDao equationDao = new EquationDao(sessionFactory);
+                                List<Equation> allEquations = equationDao.findAllEquations();
+
+                                if (!allEquations.isEmpty()) {
+                                    for (Equation eq : allEquations) {
+                                        System.out.println("Equation: " + eq.getEquation() + " | RootX: " + eq.getRootX() + " | QuantityX: " + eq.getQuantityX());
+                                    }
+                                } else {
+                                    System.out.println("No equations found in the database.");
+                                }
+                            }
+
                             default -> {
                                 System.out.println("Invalid choice. Please enter a number between 1 and 3.");
                             }
                         }
-                        if (choice.equals("4")) {
+                        if (choice.equals("5")) {
                             break;
                         }
                     }
@@ -258,3 +272,4 @@ public class Main {
         return null;
     }
 }
+

@@ -18,7 +18,7 @@ public class EquationDao {
             String hql = "FROM Equation WHERE equation = :equation";
             Query<Equation> query = session.createQuery(hql, Equation.class);
             query.setParameter("equation", equation);
-            return query.uniqueResult(); // Используем uniqueResult для получения одного результата
+            return query.uniqueResult(); 
         }
     }
 
@@ -27,7 +27,7 @@ public class EquationDao {
             String hql = "FROM Equation WHERE rootX = :root";
             Query<Equation> query = session.createQuery(hql, Equation.class);
             query.setParameter("root", root);
-            return query.list(); // Получаем список уравнений с заданным корнем
+            return query.list();
         }
     }
 
@@ -36,7 +36,15 @@ public class EquationDao {
             String hql = "FROM Equation WHERE quantityX = :quantityRoot";
             Query<Equation> query = session.createQuery(hql, Equation.class);
             query.setParameter("quantityRoot", quantityRoot);
-            return query.list(); // Получаем список уравнений с заданным количеством корней
+            return query.list();
+        }
+    }
+
+    public List<Equation> findAllEquations() {
+        try (Session session = sessionFactory.openSession()) {
+            String hql = "FROM Equation";
+            Query<Equation> query = session.createQuery(hql, Equation.class);
+            return query.list();
         }
     }
 }
