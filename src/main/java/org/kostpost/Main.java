@@ -22,7 +22,6 @@ public class Main {
         Logger logger = Logger.getLogger("org.hibernate.SQL");
         logger.setLevel(Level.OFF);
 
-
         String doAction;
         Scanner askAction = new Scanner(System.in);
 
@@ -112,6 +111,7 @@ public class Main {
 
                 case "2" -> {
                     Scanner findScanner = new Scanner(System.in);
+                    SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
                     while (true) {
                         System.out.println("\n--- Search Menu ---");
                         System.out.println("1. Find by equation.");
@@ -119,7 +119,7 @@ public class Main {
                         System.out.println("3. Find equations by quantity root");
                         System.out.println("4. See all equations");
                         System.out.println("5. Exit");
-                        System.out.print("Enter your choice (1-4): ");
+                        System.out.print("Enter your choice (1-5): ");
 
                         String choice = findScanner.nextLine();
                         switch (choice) {
@@ -134,7 +134,6 @@ public class Main {
                                         break;
                                     }
 
-                                    SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 
                                     EquationDao equationDao = new EquationDao(sessionFactory);
 
@@ -161,7 +160,6 @@ public class Main {
                                     break;
                                 }
 
-                                SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 
                                 EquationDao equationDao = new EquationDao(sessionFactory);
 
@@ -182,8 +180,6 @@ public class Main {
                                 int quantityRoot = findScanner.nextInt();
                                 findScanner.nextLine(); 
 
-                                SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
-
                                 EquationDao equationDao = new EquationDao(sessionFactory);
 
                                 List<Equation> equations = equationDao.findEquationsByQuantityRoot(quantityRoot);
@@ -199,7 +195,6 @@ public class Main {
                             }
 
                             case "4" -> {
-                                SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
                                 EquationDao equationDao = new EquationDao(sessionFactory);
                                 List<Equation> allEquations = equationDao.findAllEquations();
 
